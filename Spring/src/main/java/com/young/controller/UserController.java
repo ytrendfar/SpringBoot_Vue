@@ -1,6 +1,7 @@
 package com.young.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.young.common.Result;
 import com.young.dto.UserDTO;
 import com.young.pojo.User;
 import com.young.service.UserService;
@@ -19,8 +20,8 @@ public class UserController {
     UserService userService;
 
     @GetMapping("/selectAll")
-    public List<User> selectAll() {
-        return userService.list();
+    public Result selectAll() {
+        return Result.success(userService.list());
     }
 
     //RequestBody：把前台传入的json数据转成User对象
@@ -74,7 +75,7 @@ public class UserController {
 
     //登录
     @PostMapping("/login")
-    public boolean login(@RequestBody UserDTO user){
+    public Result login(@RequestBody UserDTO user){
         return userService.login(user);
     }
 }

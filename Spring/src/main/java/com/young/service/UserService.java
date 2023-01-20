@@ -1,5 +1,6 @@
 package com.young.service;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.poi.excel.ExcelReader;
 import cn.hutool.poi.excel.ExcelUtil;
@@ -8,7 +9,10 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.young.common.Constants;
+import com.young.common.Result;
 import com.young.dto.UserDTO;
+import com.young.exception.ServiceException;
 import com.young.mapper.UserMapper;
 import com.young.pojo.User;
 import org.springframework.stereotype.Service;
@@ -121,18 +125,26 @@ public class UserService extends ServiceImpl<UserMapper, User> {
     }
 
     //登录
-    public boolean login(UserDTO user) {
+    public Result login(UserDTO user) {
         String password = user.getPassword();
         String username = user.getUsername();
         //排除字符串为空的情况
         if(StrUtil.isBlank(password) || StrUtil.isBlank(username)){
-            return false;
+            return Result.error(Constants.CODE_400,"用户名或密码为空");
         }
         //进行判断
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("username",username);
         queryWrapper.eq("password",password);
         User one = getOne(queryWrapper);
-        return one != null;
+        if(one == null){
+            throw new ServiceException(Constants.CODE_600,"用户名或密码错误");
+        }else{
+            //把查询到的对应的用户上的信息copy到只有用户名和密码的userDTO对象上
+            BeanUtil.copyProperties(one,user,true);
+            System.out.println(user);
+            System.out.println(one);
+            return Result.success(user);
+        }
     }
 }

@@ -50,10 +50,10 @@ export default {
         //发送请求前先检查是否合法
         if(valid){
           this.request.post("/user/login", this.user).then(response => {
-            if (!response) {
+            if (response.code !== '200') {
               this.$message({
                 showClose: true,
-                message: '用户名或密码错误',
+                message: response.msg,
                 type: 'error'
               })
             } else {
@@ -62,15 +62,10 @@ export default {
                 message: '登录成功',
                 type: 'success'
               })
+              //将传入的用户信息存入本地内存
+              localStorage.setItem('user',JSON.stringify(response.data))
               this.$router.push("/")
             }
-          }).catch(error => {
-            this.$message({
-              showClose: true,
-              message: '用户名或密码错误',
-              type: 'error'
-            })
-            console.log("##登录", error)
           })
         }
       })
