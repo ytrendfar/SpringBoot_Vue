@@ -5,6 +5,7 @@ import User from "@/pages/User"
 import Home from "@/pages/Home"
 import store from "@/store";
 import Login from "@/pages/Login";
+import Register from "@/pages/Register";
 
 const router = new VueRouter({
     routes: [
@@ -37,6 +38,11 @@ const router = new VueRouter({
             path: '/login',
             name: 'Login',
             component: Login
+        },
+        {
+            path: '/register',
+            name: 'Register',
+            component: Register
         }
     ],
     mode: 'history'

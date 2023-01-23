@@ -133,18 +133,24 @@ export default {
     },
     sendRequestForData() {
       //请求分页查询的数据结果
-      const vueThis = this
       this.request.get("/user/page", {
         params: {
-          pageNum: vueThis.pageNum,
-          pageSize: vueThis.pageSize,
-          string: vueThis.input,
-          type: vueThis.searchBy
+          pageNum: this.pageNum,
+          pageSize: this.pageSize,
+          string: this.input,
+          type: this.searchBy
         }
       }).then(response => {
-            console.log("分页数据请求成功！", response)
-            this.tableData = response.records
-            this.total = response.total
+            if (response.code === '200') {
+              console.log("分页数据请求成功！", response)
+              this.tableData = response.data.records
+              this.total = response.data.total
+            }else if(response.code === '401'){
+              //由于已经在request.js中进行过全局配置了，所以不需要再进行提示，只需要push即可
+              // this.$message.error(response.msg)
+              console.log(response.msg,response)
+              this.$router.push('/login')
+            }
           }
       ).catch(error => {
         console.log("分页数据请求失败！", error)
@@ -165,7 +171,7 @@ export default {
         type: 'warning'
       }).then(() => {
         this.request.delete(`/user/delete/${scope.id}`).then(response => {
-          if (response) {
+          if (response.code === '200') {
             this.$message({
               type: 'success',
               message: '删除成功!'
@@ -194,7 +200,7 @@ export default {
     //发送新增或者更新请求
     sendCreateOrUpdateRequest() {
       this.request.post("/user/save", this.form).then(response => {
-        if (response) {
+        if (response.code === '200') {
           this.dialogFormVisible = false
           if (this.form.id) {
             this.$message({
@@ -240,7 +246,7 @@ export default {
         type: 'warning'
       }).then(() => {
         this.request.post("/user/del/batch", ids).then(response => {
-          if (response) {
+          if (response.code === '200') {
             this.$message({
               type: 'success',
               message: '删除成功!'
@@ -278,28 +284,6 @@ export default {
           message: '已取消导出'
         });
       });
-      //错误的导出方式
-      // this.request.post("/user/export", ids).then(response => {
-      //   if (response) {
-      //     console.log("##导出", "导出成功")
-      //     this.$message({
-      //       type: 'success',
-      //       message: '导出成功！'
-      //     })
-      //   } else {
-      //     console.log("##导出", "导出失败")
-      //     this.$message({
-      //       type: 'error',
-      //       message: '导出失败！'
-      //     })
-      //   }
-      // }).catch(error => {
-      //   console.log("##导出", error)
-      //   this.$message({
-      //     type: 'error',
-      //     message: '导出失败！'
-      //   })
-      // })
     },
     //导入
     importSuccess() {
@@ -310,7 +294,7 @@ export default {
       })
       this.sendRequestForData()
     },
-    importFailed(){
+    importFailed() {
       console.log("#导入", "导出失败")
       this.$message({
         type: 'error',

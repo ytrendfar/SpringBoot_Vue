@@ -11,14 +11,11 @@
           <el-input size="medium" style="margin: 20px 0 5px" prefix-icon="el-icon-user" v-model="user.username" />
         </el-form-item>
         <el-form-item prop="password">
-          <el-input size="medium" style="margin: 5px 0" prefix-icon="el-icon-lock" show-password v-model="user.password" />
+          <el-input size="medium" style="margin: 5px 0" prefix-icon="el-icon-lock" show-password v-model="user.password" @keydown.enter.native="login"/>
         </el-form-item>
         <el-form-item style="margin: 10px 0;text-align: right">
-          <el-button style="background-color: rgb(177, 170, 79);color: #EEE" size="small" autocomplete="off"
-                     @click="login">登录
-          </el-button>
-          <el-button style="background-color: rgb(88, 170, 167);color: #EEE" size="small" autocomplete="off">注册
-          </el-button>
+          <el-button style="background-color: rgb(177, 170, 79);color: #EEE" size="small" autocomplete="off" @click="login">登录</el-button>
+          <el-button style="background-color: rgb(88, 170, 167);color: #EEE" size="small" autocomplete="off" @click="$router.push('/register')">注册</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -31,7 +28,8 @@ export default {
   name: "Login",
   data() {
     return {
-      user: {},
+      //如果总线中存储了刚注册完的用户名那么就直接赋值
+      user: {username: this.$store.state.afterRegisterUsername ? this.$store.state.afterRegisterUsername : '' },
       rules: {
         username: [
           {required: true, message: '请输入用户名', trigger: 'blur'},
@@ -70,6 +68,9 @@ export default {
         }
       })
     },
+  },
+  beforeDestroy() {
+    this.$store.state.afterRegisterUsername = ''
   }
 }
 </script>

@@ -17,4 +17,13 @@ public class UserDTO {
     private String nickname;
     @Alias("头像")
     private String avatar;
+    @Alias("邮箱")
+    private String email;
+    @Alias("电话")
+    private String phone;
+    @Alias("地址")
+    private String address;
+
+    private String token;
+
 }

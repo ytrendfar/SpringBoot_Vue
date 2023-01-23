@@ -13,7 +13,8 @@ const mutations = {
 //准备state，用于存放数据
 const state = {
     isCollapse: false,
-    currentPath: ''
+    currentPath: '',
+    afterRegisterUsername: ''
 }
 //创建并导出store
 export default new Vuex.Store({

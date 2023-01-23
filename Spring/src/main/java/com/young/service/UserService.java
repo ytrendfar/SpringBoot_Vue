@@ -15,6 +15,8 @@ import com.young.dto.UserDTO;
 import com.young.exception.ServiceException;
 import com.young.mapper.UserMapper;
 import com.young.pojo.User;
+import com.young.utils.TokenUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -73,14 +75,14 @@ public class UserService extends ServiceImpl<UserMapper, User> {
 //    }
 
     //使用mp来实现分页查询
-    public IPage<User> selectPage(Integer pageNum, Integer pageSize, String string, String type) {
+    public Result selectPage(Integer pageNum, Integer pageSize, String string, String type) {
         IPage<User> page = new Page<>(pageNum, pageSize);
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         //将把type转化为具体字段名
         type = type.equals("0") ? "username" : type.equals("1") ? "email" : "address";
         //添加某字段的模糊查询
         queryWrapper.like(type, string);
-        return page(page, queryWrapper);
+        return Result.success(page(page, queryWrapper));
     }
     //如果是多条件查询，需要先对传入的参数进行判断，如果是空的话不能进行queryWrapper的添加
 
@@ -142,9 +144,30 @@ public class UserService extends ServiceImpl<UserMapper, User> {
         }else{
             //把查询到的对应的用户上的信息copy到只有用户名和密码的userDTO对象上
             BeanUtil.copyProperties(one,user,true);
-            System.out.println(user);
-            System.out.println(one);
+            //设置token
+            String token = TokenUtils.genToken(one.getId().toString(),one.getPassword());
+            user.setToken(token);
             return Result.success(user);
+        }
+    }
+
+    public Result register(UserDTO user) {
+        String username = user.getUsername();
+        //进行判断
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("username",username);
+        User one = getOne(queryWrapper);
+        System.out.println(user);
+        if(one != null){
+            throw new ServiceException(Constants.CODE_400,"用户名已存在");
+        }else{
+            one = new User();
+            BeanUtil.copyProperties(user,one,true);
+            if(save(one)){
+                return Result.success();
+            }else{
+                return Result.error();
+            }
         }
     }
 }

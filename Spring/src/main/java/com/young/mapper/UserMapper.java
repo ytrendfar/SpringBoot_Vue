@@ -30,4 +30,9 @@ public interface UserMapper extends BaseMapper<User> {
 //
 //    @Select("select count(*) from sys_user")
 //    Integer selectAllCount();
+
+
+    //注册
+//    @Insert("insert into sys_user(username,password,nickname,email,phone,address) values (#{username},#{password},#{nickname},#{email},#{phone},#{address})")
+//    boolean registerNew(User user);
 }
