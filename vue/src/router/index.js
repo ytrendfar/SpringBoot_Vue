@@ -6,6 +6,8 @@ import Home from "@/pages/Home"
 import store from "@/store";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
+import File from "@/pages/File";
+import Mine from "@/pages/Mine";
 
 const router = new VueRouter({
     routes: [
@@ -26,6 +28,18 @@ const router = new VueRouter({
                     name: 'Home',
                     component: Home,
                     meta: {pathName: '首页'}
+                },
+                {
+                    path: 'file',
+                    name: 'File',
+                    component: File,
+                    meta: {pathName: '文件管理'}
+                },
+                {
+                    path: 'mine',
+                    name: 'Mine',
+                    component: Mine,
+                    meta: {pathName: '个人中心'}
                 }
             ]
         },

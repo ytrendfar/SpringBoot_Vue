@@ -19,7 +19,9 @@
     <el-dropdown trigger="click">
       <span class="el-icon-arrow-down" style="margin-left: 15px;cursor: pointer;font-size: 18px"></span>
       <el-dropdown-menu slot="dropdown" style="width: 100px;text-align: center">
-        <el-dropdown-item style="font-size: 15px;padding: 5px 0">个人中心</el-dropdown-item>
+        <el-dropdown-item style="font-size: 15px;padding: 5px 0">
+          <span @click="$router.push('/mine')">个人中心</span>
+        </el-dropdown-item>
         <el-dropdown-item class="exitLogin" style="font-size: 15px;padding: 5px 0">
           <span @click="logout">退出登录</span>
         </el-dropdown-item>

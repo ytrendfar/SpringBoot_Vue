@@ -41,5 +41,6 @@ public class User {
     @TableField(value = "avatar_url")
     @Alias("头像")
     private String avatar;
+    @Alias("创建时间")
     private Date createTime;
 }
