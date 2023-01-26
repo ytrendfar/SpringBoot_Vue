@@ -4,6 +4,7 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -61,7 +62,8 @@ public class FileService extends ServiceImpl<FileMapper, Files> {
         md5 = SecureUtil.md5(uploadFile);
         QueryWrapper<Files> qw = new QueryWrapper<>();
         qw.eq("md5", md5);
-        Files md5File = getOne(qw);
+        //（已处理）处理 TooManyResult 异常。原因是数据库中存在同md5但不同名的文件，导致getOne返回多个结果。通过list获取多个并取其一解决
+        Files md5File = list(qw).get(0);
         //进行判断
         if (md5File != null) {
             //如果已存在相同md5的文件，删除新存入的文件
@@ -71,6 +73,14 @@ public class FileService extends ServiceImpl<FileMapper, Files> {
             url = "http://localhost/file/" + fileUuid;
         }
 
+        //进行查重
+        LambdaQueryWrapper<Files> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(Files::getName, originalFilename);
+        lqw.eq(Files::getMd5, md5);
+        if(count(lqw) > 0){
+            //已经有名称和md5都相同的数据，直接返回，不存入数据库
+            return url;
+        }
 
         //新建一个pojo类，设置名称类型和大小
         Files saveFile = new Files();
@@ -79,7 +89,6 @@ public class FileService extends ServiceImpl<FileMapper, Files> {
         saveFile.setSize(size / 1024);
         saveFile.setMd5(md5);
         saveFile.setUrl(url);
-
         //存储至数据库中
         save(saveFile);
         return url;

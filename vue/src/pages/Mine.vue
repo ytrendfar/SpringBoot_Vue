@@ -57,7 +57,7 @@
                   <el-input auto-complete="off" v-model="user.phone"></el-input>
                 </el-form-item>
                 <el-form-item label="地址" prop="homeUrl">
-                  <el-input  maxlength="18" v-model="user.address"></el-input>
+                  <el-input type="textarea" maxlength="18" v-model="user.address"></el-input>
                 </el-form-item>
 
               </el-form>
@@ -96,6 +96,8 @@ export default {
             this.$message.success('修改成功')
             //同时修改本地内存中的数据
             localStorage.setItem('user',JSON.stringify(this.user))
+            //触发全局事件总线
+            this.$bus.$emit('updateAvatar',this.user.avatar,this.user.nickname)
           }else{
             this.$message.error('保存失败')
           }
@@ -105,13 +107,15 @@ export default {
       })
     },
     //头像上传相关
-    handleAvatarSuccess(res, file) {
-      this.user.avatar = URL.createObjectURL(file.raw);
+    handleAvatarSuccess(res) {
+      this.user.avatar = res
       this.request.post('/user/save',this.user).then(res =>{
         if (res.code === '200'){
           this.$message.success('头像修改成功')
           //同时修改本地内存中的数据
           localStorage.setItem('user',JSON.stringify(this.user))
+          //触发全局事件总线
+          this.$bus.$emit('updateAvatar',this.user.avatar,this.user.nickname)
         }else{
           this.$message.error('头像保存失败')
         }
