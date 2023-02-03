@@ -8,6 +8,8 @@ import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import File from "@/pages/File";
 import Mine from "@/pages/Mine";
+import Role from "@/pages/Role";
+import Menus from "@/pages/Menus";
 
 const router = new VueRouter({
     routes: [
@@ -40,7 +42,20 @@ const router = new VueRouter({
                     name: 'Mine',
                     component: Mine,
                     meta: {pathName: '个人中心'}
-                }
+                },
+                {
+                    path: 'role',
+                    name: 'Role',
+                    component: Role,
+                    meta: {pathName: '角色管理'}
+                },
+                {
+                    path: 'menus',
+                    name: 'Menus',
+                    component: Menus,
+                    meta: {pathName: '菜单管理'}
+                },
+
             ]
         },
         {
@@ -63,9 +78,6 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to,from,next)=>{
-    // if(to.path === from.path){
-    //     return next(false)
-    // }
     store.state.currentPath = to.meta.pathName
     next()
 })

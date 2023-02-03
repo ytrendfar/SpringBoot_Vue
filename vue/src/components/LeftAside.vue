@@ -31,6 +31,16 @@
             <span slot="title">文件管理</span>
           </template>
         </el-menu-item>
+        <el-menu-item index="/role">
+          <template slot="title"><i class="el-icon-postcard"></i>
+            <span slot="title">角色管理</span>
+          </template>
+        </el-menu-item>
+        <el-menu-item index="/menus">
+          <template slot="title"><i class="el-icon-set-up"></i>
+            <span slot="title">菜单管理</span>
+          </template>
+        </el-menu-item>
       </el-submenu>
       <el-menu-item index="/mine">
         <i class="el-icon-s-custom"></i>
