@@ -1,9 +1,11 @@
 package com.young.dto;
 
 import cn.hutool.core.annotation.Alias;
+import com.young.pojo.Menu;
 import lombok.Data;
 
 import java.sql.Date;
+import java.util.List;
 
 /**
  * 用于接收前端登录请求的参数
@@ -28,6 +30,9 @@ public class UserDTO {
     private String address;
     @Alias("创建时间")
     private Date createTime;
+    @Alias("角色")
+    private String role;
+    private List<Menu> menus;
     private String token;
 
 }

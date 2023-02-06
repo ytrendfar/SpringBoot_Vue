@@ -14,65 +14,33 @@ import com.young.common.Result;
 import com.young.dto.UserDTO;
 import com.young.exception.ServiceException;
 import com.young.mapper.UserMapper;
+import com.young.pojo.Menu;
+import com.young.pojo.Role;
+import com.young.pojo.RoleMenu;
 import com.young.pojo.User;
 import com.young.utils.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService extends ServiceImpl<UserMapper, User> {
-//    @Autowired
-//    private UserMapper userMapper;
-
-    //查询所有用户
-//    public List<User> findAll() {
-//        return list();
-//    }
-
-    //    插入和更新：如果传入了id则为更新，未传入id则为插入
-//    public boolean save(User user) {
-//        if (user.getId() == null) {
-//            return save(user);
-//        } else {
-//            return updateById(user);
-//        }
-//    }
-
-//    //新增和更新
-//    public boolean createOrUpdate(User user) {
-//        return saveOrUpdate(user);
-//    }
-
-
-//    //根据id删除用户
-//    public boolean deleteById(Integer id) {
-//        return removeById(id);
-//    }
-
-    /**
-     * 分页查询
-     *
-     * @param pageNum  页数。通过计算：（页数-1）乘 每页显示个数 求得索引
-     * @param pageSize 每页要展示的数量
-     * @return 返回查询结果和查询结果总数组成的map集合
-     */
-//    public Map<String, Object> selectPage(Integer pageNum, Integer pageSize) {
-//        pageNum = (pageNum - 1) * pageSize;
-//        List<User> data = userMapper.selectPage(pageNum, pageSize);
-//        Integer total = userMapper.selectAllCount();
-//        Map<String, Object> map = new HashMap<>();
-//        map.put("data", data);
-//        map.put("total", total);
-//        return map;
-//    }
+    @Resource
+    private RoleService roleService;
+    @Resource
+    private MenuService menuService;
+    @Resource
+    private RoleMenuService roleMenuService;
 
     //使用mp来实现分页查询
     public Result selectPage(Integer pageNum, Integer pageSize, String string, String type) {
@@ -85,7 +53,6 @@ public class UserService extends ServiceImpl<UserMapper, User> {
         return Result.success(page(page, queryWrapper));
     }
     //如果是多条件查询，需要先对传入的参数进行判断，如果是空的话不能进行queryWrapper的添加
-
 
     //实现导出
     public void export(HttpServletResponse response) throws IOException {
@@ -131,41 +98,91 @@ public class UserService extends ServiceImpl<UserMapper, User> {
         String password = user.getPassword();
         String username = user.getUsername();
         //排除字符串为空的情况
-        if(StrUtil.isBlank(password) || StrUtil.isBlank(username)){
-            return Result.error(Constants.CODE_400,"用户名或密码为空");
+        if (StrUtil.isBlank(password) || StrUtil.isBlank(username)) {
+            return Result.error(Constants.CODE_400, "用户名或密码为空");
         }
         //进行判断
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("username",username);
-        queryWrapper.eq("password",password);
+        queryWrapper.eq("username", username);
+        queryWrapper.eq("password", password);
         User one = getOne(queryWrapper);
-        if(one == null){
-            throw new ServiceException(Constants.CODE_600,"用户名或密码错误");
-        }else{
+        if (one == null) {
+            throw new ServiceException(Constants.CODE_600, "用户名或密码错误");
+        } else {
             //把查询到的对应的用户上的信息copy到只有用户名和密码的userDTO对象上
-            BeanUtil.copyProperties(one,user,true);
+            BeanUtil.copyProperties(one, user, true);
             //设置token
-            String token = TokenUtils.genToken(one.getId().toString(),one.getPassword());
+            String token = TokenUtils.genToken(one.getId().toString(), one.getPassword());
             user.setToken(token);
+            //设置menus
+            //调用方法获取menu集合
+            user.setMenus(getMenusByRoleId(one));
             return Result.success(user);
         }
+    }
+
+    /**
+     * 获取用户可用的菜单集合
+     *
+     * @param user 传入数据库中查询到的用户
+     * @return 返回对应的menu集合
+     */
+    private List<Menu> getMenusByRoleId(User user) {
+        //获取角色字符串
+        String roleString = user.getRole();
+        //获取对应flag的角色
+        Role role = roleService.getOne(new QueryWrapper<Role>().eq("flag", roleString));
+        //获取所有菜单
+        List<Menu> menus = menuService.findMenus();
+        //获取角色对应的菜单集合
+        QueryWrapper<RoleMenu> qw = new QueryWrapper<>();
+        qw.eq("role_id", role.getId());
+        List<Integer> menuIds = menuService.list(new QueryWrapper<Menu>()
+                        .in("id", roleMenuService.list(qw).stream().map(RoleMenu::getMenuId).collect(Collectors.toList())))
+                .stream().map(Menu::getId).collect(Collectors.toList());
+        //删除多余的菜单
+        List<Menu> result = new ArrayList<>();
+        for (Menu menu : menus) {
+            if (menuIds.contains(menu.getId())) {
+                result.add(menu);
+            } else {
+                //该项不符合，则检查该项的子项
+                if (menu.getChildren().size() != 0) {
+                    List<Menu> childrenMenu = new ArrayList<>();
+                    for (Menu child : menu.getChildren()) {
+                        if (menuIds.contains(child.getId())) {
+                            childrenMenu.add(child);
+                        }
+                    }
+                    if(childrenMenu.size() != 0){
+                        //设置新的子项
+                        menu.setChildren(childrenMenu);
+                        result.add(menu);
+                    }
+                }
+            }
+            //再移出不在ids中的二级菜单
+            List<Menu> children = menu.getChildren();
+            children.removeIf(child -> !menuIds.contains(child.getId()));       //如果ids中不包含children的遍历项的id，就移除此项
+        }
+        return result;
     }
 
     public Result register(UserDTO user) {
         String username = user.getUsername();
         //进行判断
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("username",username);
+        queryWrapper.eq("username", username);
         User one = getOne(queryWrapper);
         System.out.println(user);
-        if(one != null){
-            throw new ServiceException(Constants.CODE_400,"用户名已存在");
-        }else{
+        if (one != null) {
+            throw new ServiceException(Constants.CODE_400, "用户名已存在");
+        } else {
             one = new User();
-            BeanUtil.copyProperties(user,one,true);
-            if(save(one)){
+            BeanUtil.copyProperties(user, one, true);
+            if (save(one)) {
                 return Result.success();
-            }else{
+            } else {
                 return Result.error();
             }
         }

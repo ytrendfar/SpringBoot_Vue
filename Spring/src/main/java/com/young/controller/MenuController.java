@@ -27,16 +27,7 @@ public class MenuController {
 
     @GetMapping("/selectAll")
     public Result selectAll() {
-        //查询所有菜单
-        List<Menu> list = menuService.list();
-        //找出pid为null的一级菜单
-        List<Menu> parentNode = list.stream().filter(menu -> menu.getPid() == null).collect(Collectors.toList());
-        //找出一级菜单的子菜单
-        for (Menu menu : parentNode) {
-            //筛选出二级菜单，即pid等于menu的id的元素
-            menu.setChildren(list.stream().filter(m -> menu.getId().equals(m.getPid())).collect(Collectors.toList()));
-        }
-        return Result.success(parentNode);
+        return Result.success(menuService.findMenus());
     }
 
     @PostMapping("/save")

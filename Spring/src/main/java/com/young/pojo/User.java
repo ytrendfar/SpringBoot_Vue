@@ -43,4 +43,6 @@ public class User {
     private String avatar;
     @Alias("创建时间")
     private Date createTime;
+    @Alias("角色")
+    private String role;
 }

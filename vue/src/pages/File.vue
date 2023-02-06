@@ -23,9 +23,10 @@
               @selection-change="handleSelectionChange">
       <el-table-column
           type="selection"
-          width="50">
+          width="50"
+          align="center">
       </el-table-column>
-      <el-table-column prop="id" label="ID" width="50"></el-table-column>
+      <el-table-column prop="id" align="center" label="ID" width="50"></el-table-column>
       <el-table-column prop="name" label="文件名"></el-table-column>
       <el-table-column prop="type" label="文件类型" width="80"></el-table-column>
       <el-table-column prop="size" label="文件大小(KB)" width="100"></el-table-column>
@@ -98,7 +99,7 @@ export default {
         }
       }).then(response => {
             if (response.code === '200') {
-              console.log("分页数据请求成功！", response)
+              // console.log("分页数据请求成功！", response)
               this.tableData = response.data.records
               this.total = response.data.total
             }else if(response.code === '401'){

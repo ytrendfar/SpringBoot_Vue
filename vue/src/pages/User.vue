@@ -37,24 +37,33 @@
       <!--          点击按钮产生的对话框-->
       <el-dialog title="用户信息" :visible.sync="dialogFormVisible">
         <el-form :model="form">
-          <el-form-item label="用户名">
+          <el-form-item label="用户名" label-width="80px" label-align="right">
             <el-input v-model="form.username" autocomplete="off"></el-input>
           </el-form-item>
-          <el-form-item label="昵称">
+          <el-form-item label="昵称" label-width="80px" label-align="right">
             <el-input v-model="form.nickname" autocomplete="off"></el-input>
           </el-form-item>
-          <el-form-item label="邮箱">
+          <el-form-item label="角色" label-width="80px" label-align="right">
+            <el-select clearable v-model="form.role" placeholder="请选择角色..." style="width:100%">
+              <el-option v-for="role in roles" :key="role.flag" :label="role.name" :value="role.flag" >
+                <span style="font-weight: 800">{{role.name}}：</span>
+                <span style="margin-left: 30px"><i>{{role.description}}</i></span>
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="邮箱" label-width="80px" label-align="right">
             <el-input v-model="form.email" autocomplete="off"></el-input>
           </el-form-item>
-          <el-form-item label="地址">
+          <el-form-item label="地址" label-width="80px" label-align="right">
             <el-input v-model="form.address" autocomplete="off"></el-input>
           </el-form-item>
-          <el-form-item label="电话">
+          <el-form-item label="电话" label-width="80px" label-align="right">
             <el-input v-model="form.phone" autocomplete="off"></el-input>
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
-          <el-button @click="dialogFormVisible = false">取 消</el-button>
+<!--          <el-button @click="dialogFormVisible = false">取 消</el-button>-->
+          <el-button>取 消</el-button>
           <el-button type="primary" @click="sendCreateOrUpdateRequest">确 定</el-button>
         </div>
       </el-dialog>
@@ -64,15 +73,16 @@
               @selection-change="handleSelectionChange">
       <el-table-column
           type="selection"
-          width="55">
+          width="50" align="center">
       </el-table-column>
-      <el-table-column prop="id" label="ID"></el-table-column>
-      <el-table-column prop="username" label="用户名" width="120"></el-table-column>
-      <el-table-column prop="nickname" label="昵称" width="120"></el-table-column>
-      <el-table-column prop="email" label="邮箱" width="140"></el-table-column>
-      <el-table-column prop="phone" label="电话" width="120"></el-table-column>
+      <el-table-column prop="id" label="ID" width="50" align="center"></el-table-column>
+      <el-table-column prop="username" label="用户名"></el-table-column>
+      <el-table-column prop="nickname" label="昵称"></el-table-column>
+      <el-table-column prop="role" label="角色"></el-table-column>
+      <el-table-column prop="email" label="邮箱"></el-table-column>
+      <el-table-column prop="phone" label="电话"></el-table-column>
       <el-table-column prop="address" label="地址"></el-table-column>
-      <el-table-column prop="edit" label="操作">
+      <el-table-column prop="edit" label="操作" width="175px" align="center">
         <template slot-scope="scope">
           <el-button-group>
             <el-button type="primary" icon="el-icon-edit" @click="editData(scope.row)">编辑</el-button>
@@ -118,7 +128,9 @@ export default {
       dialogFormVisible: false,
       form: {},
       multipleSelection: [],
-      showImportDialog: false
+      showImportDialog: false,
+      //选择角色
+      roles: {}
     }
   },
   methods: {
@@ -142,7 +154,7 @@ export default {
         }
       }).then(response => {
             if (response.code === '200') {
-              console.log("分页数据请求成功！", response)
+              // console.log("分页数据请求成功！", response)
               this.tableData = response.data.records
               this.total = response.data.total
             }else if(response.code === '401'){
@@ -154,6 +166,16 @@ export default {
           }
       ).catch(error => {
         console.log("分页数据请求失败！", error)
+      })
+      //查询角色信息
+      this.request.get('/role/selectAll').then(res=>{
+        if(res.code === '200'){
+          this.roles = res.data
+        }else{
+          this.$message.error('获取角色信息失败')
+        }
+      }).catch(err=>{
+        console.log('获取角色信息失败',err)
       })
     },
     handleCommand(command) {

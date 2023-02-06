@@ -1,17 +1,14 @@
 package com.young.controller;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.young.common.Result;
 import com.young.dto.UserDTO;
 import com.young.pojo.User;
 import com.young.service.UserService;
-import com.young.utils.TokenUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 
 @RestController

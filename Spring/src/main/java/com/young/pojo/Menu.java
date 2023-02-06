@@ -27,6 +27,8 @@ public class Menu {
     private String path;
     @Alias("图标")
     private String icon;
+    @Alias("组件")
+    private String component;
     @Alias("描述")
     private String description;
     //字段在数据库中不存在

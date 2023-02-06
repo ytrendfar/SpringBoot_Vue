@@ -16,7 +16,8 @@
               default-expand-all>
       <el-table-column
           type="selection"
-          width="50">
+          width="50"
+          align="center">
       </el-table-column>
       <el-table-column prop="id" label="ID" width="75"></el-table-column>
       <el-table-column label="图标" width="50px" align="center">
@@ -26,11 +27,13 @@
       </el-table-column>
       <el-table-column prop="name" label="菜单名称"></el-table-column>
       <el-table-column prop="path" label="路径"></el-table-column>
+      <el-table-column prop="component" label="组件名称"></el-table-column>
       <el-table-column prop="description" label="描述"></el-table-column>
       <el-table-column prop="edit" label="操作" align="center" width="275">
         <template slot-scope="scope">
           <el-button-group style="display: flex;justify-content: flex-end">
-            <el-button type="success" icon="el-icon-plus" @click="addChild(scope.row.id)" v-if="!scope.row.pid">新增子菜单</el-button>
+            <el-button type="success" icon="el-icon-plus" @click="addChild(scope.row.id)" v-if="!scope.row.pid">新增子菜单
+            </el-button>
             <el-button type="primary" icon="el-icon-download" @click="edit(scope.row)">编辑</el-button>
             <el-button type="danger" icon="el-icon-delete" @click="deleteData(scope.row)">删除</el-button>
           </el-button-group>
@@ -50,13 +53,14 @@
         </el-form-item>
         <el-form-item label="图标"><br>
           <el-select clearable v-model="form.icon" placeholder="请选择图标..." style="width:100%">
-            <el-option v-for="item in options" :key="item.name" :label="item.name" :value="item.value" >
-              <i :class="item.value"/><span style="margin-left: 5px">{{item.name}}</span>
+            <el-option v-for="item in options" :key="item.name" :label="item.name" :value="item.value">
+              <i :class="item.value"/><span style="margin-left: 5px">{{ item.name }}</span>
             </el-option>
           </el-select>
-<!--          <el-input v-model="form.icon" autocomplete="off"></el-input>-->
         </el-form-item>
-
+        <el-form-item label="组件名称">
+          <el-input v-model="form.component" autocomplete="off"></el-input>
+        </el-form-item>
         <el-form-item label="描述">
           <el-input type="textarea" v-model="form.description" autocomplete="off"></el-input>
         </el-form-item>
@@ -83,7 +87,7 @@ export default {
       multipleSelection: [],
       dialogFormVisible: false,
       form: {},
-      options:[]
+      options: []
     }
   },
   created() {
@@ -107,7 +111,7 @@ export default {
       //请求查询所有的数据结果
       this.request.get("/menu/selectAll").then(response => {
             if (response.code === '200') {
-              console.log("树形数据请求成功！", response)
+              // console.log("树形数据请求成功！", response)
               this.tableData = response.data
             } else if (response.code === '401') {
               //由于已经在request.js中进行过全局配置了，所以不需要再进行提示，只需要push即可
@@ -163,6 +167,7 @@ export default {
     createNew() {
       this.form = {}
       this.dialogFormVisible = true
+      this.sendRequestForIcon()
     },
     //将选中的用户放入数组等待操作
     handleSelectionChange(val) {
@@ -199,21 +204,21 @@ export default {
       })
     },
     //新增子菜单
-    addChild(pid){
+    addChild(pid) {
       this.dialogFormVisible = true
       this.form = {}
-      if(pid){
+      if (pid) {
         this.form.pid = pid
       }
       //请求图标数据
       this.sendRequestForIcon()
     },
     //请求图标数据。在新增子菜单和编辑时使用
-    sendRequestForIcon(){
-      this.request.get('/menu/icon').then(res=>{
+    sendRequestForIcon() {
+      this.request.get('/menu/icon').then(res => {
         this.options = res.data
-        console.log('图标数据请求成功！',res)
-      }).catch(err=>{
+        // console.log('图标数据请求成功！',res)
+      }).catch(err => {
         console.log('图标数据请求失败！', err)
       })
     }

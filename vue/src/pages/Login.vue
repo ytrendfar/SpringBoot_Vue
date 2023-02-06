@@ -23,6 +23,8 @@
 </template>
 
 <script>
+import {setRoutes} from "@/router";
+
 export default {
   // eslint-disable-next-line vue/multi-word-component-names
   name: "Login",
@@ -55,14 +57,18 @@ export default {
                 type: 'error'
               })
             } else {
+              //登录成功
+              //将传入的用户信息存入本地内存
+              localStorage.setItem('user',JSON.stringify(response.data))
+              //设置动态路由
+              setRoutes()
+              this.$router.push("/")
+              //弹窗
               this.$message({
                 showClose: true,
                 message: '登录成功',
                 type: 'success'
               })
-              //将传入的用户信息存入本地内存
-              localStorage.setItem('user',JSON.stringify(response.data))
-              this.$router.push("/")
             }
           })
         }

@@ -22,4 +22,7 @@ public class Role {
     private String name;
     @Alias("描述")
     private String description;
+    @Alias("唯一标识")
+    private String flag;
+
 }

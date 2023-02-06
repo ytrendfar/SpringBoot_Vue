@@ -14,9 +14,10 @@
               @selection-change="handleSelectionChange">
       <el-table-column
           type="selection"
-          width="50">
+          width="50"
+          align="center">
       </el-table-column>
-      <el-table-column prop="id" label="ID" width="50"></el-table-column>
+      <el-table-column prop="id" label="ID" align="center" width="50"></el-table-column>
       <el-table-column prop="name" label="角色名称"></el-table-column>
       <el-table-column prop="description" label="描述"></el-table-column>
       <el-table-column prop="edit" label="操作" align="center" width="260">
@@ -177,7 +178,7 @@ export default {
         }
       }).then(response => {
             if (response.code === '200') {
-              console.log("分页数据请求成功！", response)
+              // console.log("分页数据请求成功！", response)
               this.tableData = response.data.records
               this.total = response.data.total
             } else if (response.code === '401') {
@@ -270,10 +271,11 @@ export default {
     //分配菜单
     giveMenu(id) {
       this.roleId = id
+      this.checks = []
       //请求菜单数据
       this.request.get('/menu/selectAll').then(res => {
         if (res.code === '200') {
-          console.log('菜单数据请求成功！', res)
+          // console.log('菜单数据请求成功！', res)
           this.menuData = res.data
           //将id映射至默认展开的数组中，使所有选项默认展开
           this.expandedArr = this.menuData.map(v => v.id)
@@ -286,7 +288,7 @@ export default {
       //请求关系数据
       this.request.get('/role/roleMenu/'+this.roleId).then(res => {
         if (res.code === '200') {
-          console.log('关系数据请求成功！', res)
+          // console.log('关系数据请求成功！', res)
           this.checks = res.data
         } else {
           this.$message.error('角色数据请求失败')
