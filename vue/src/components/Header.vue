@@ -5,7 +5,7 @@
                 @click="changeIcon"></span>
     </div>
     <el-breadcrumb separator-class="el-icon-d-arrow-right" style="flex: 20; line-height: 60px; height: 100%">
-      <el-breadcrumb-item :to="{name:'Home'}" v-if="$store.state.currentPath !== '首页'">首页</el-breadcrumb-item>
+      <el-breadcrumb-item :to="{name:'Home'}" v-if="$route.path !== '/home'">主页</el-breadcrumb-item>
       <el-breadcrumb-item><b>{{ $store.state.currentPath }}</b></el-breadcrumb-item>
     </el-breadcrumb>
     <el-image :src="imgSrc" alt=""
@@ -20,7 +20,7 @@
       <span class="el-icon-arrow-down" style="margin-left: 15px;cursor: pointer;font-size: 18px"></span>
       <el-dropdown-menu slot="dropdown" style="width: 100px;text-align: center">
         <el-dropdown-item style="font-size: 15px;padding: 5px 0">
-          <span @click="$router.push('/mine')">个人中心</span>
+          <span @click="jump">个人中心</span>
         </el-dropdown-item>
         <el-dropdown-item class="exitLogin" style="font-size: 15px;padding: 5px 0">
           <span @click="logout">退出登录</span>
@@ -56,6 +56,11 @@ export default {
         message: '账号已退出',
         type: 'warning'
       })
+    },
+    jump() {
+      if (this.$route.path !== '/mine') {
+        this.$router.push('/mine')
+      }
     }
   },
   computed: {
@@ -67,7 +72,7 @@ export default {
     }
   },
   mounted() {
-    this.$bus.$on('updateAvatar',(avatarUrl,nickname)=>{
+    this.$bus.$on('updateAvatar', (avatarUrl, nickname) => {
       this.user.avatar = avatarUrl
       this.user.nickname = nickname
     })

@@ -88,7 +88,7 @@ export const setRoutes = () => {
         //固定部分
         path: '/',
         name: 'Manage',
-        component: () => import(`@/pages/Manage.vue`),
+        component: () => import(`@/components/Manage.vue`),
         redirect: '/home',
         //动态部分
         children: []
@@ -123,6 +123,10 @@ export const setRoutes = () => {
 setRoutes()
 
 router.beforeEach((to, from, next) => {
+    if(to.path === from.path){
+        console.log("!")
+        next(false)
+    }
     store.state.currentPath = to.meta.pathName
     if(!to.matched.length){
         const storeUser = localStorage.getItem('user')

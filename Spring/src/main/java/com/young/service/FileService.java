@@ -63,21 +63,29 @@ public class FileService extends ServiceImpl<FileMapper, Files> {
         QueryWrapper<Files> qw = new QueryWrapper<>();
         qw.eq("md5", md5);
         //（已处理）处理 TooManyResult 异常。原因是数据库中存在同md5但不同名的文件，导致getOne返回多个结果。通过list获取多个并取其一解决
-        Files md5File = list(qw).get(0);
+        List<Files> files = list(qw);
+        Files md5File;
+        if (files.size() != 0) {
+            md5File = list(qw).get(0);
+        } else {
+            md5File = null;
+        }
+
         //进行判断
         if (md5File != null) {
             //如果已存在相同md5的文件，删除新存入的文件
             url = md5File.getUrl();
             uploadFile.delete();
         } else {
-            url = "http://localhost/file/" + fileUuid;
+            url = "http://localhost:8080/file/" + fileUuid;
+//            url = "http://39.107.102.145:8080/file/" + fileUuid;
         }
 
         //进行查重
         LambdaQueryWrapper<Files> lqw = new LambdaQueryWrapper<>();
         lqw.eq(Files::getName, originalFilename);
         lqw.eq(Files::getMd5, md5);
-        if(count(lqw) > 0){
+        if (count(lqw) > 0) {
             //已经有名称和md5都相同的数据，直接返回，不存入数据库
             return url;
         }

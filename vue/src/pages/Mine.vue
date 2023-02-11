@@ -10,7 +10,7 @@
             <el-upload
                 style="text-align: center"
                 class="avatar-uploader"
-                action="http://localhost/file/upload"
+                :action="'http://'+serverIp+'/file/upload'"
                 :show-file-list="false"
                 :on-success="handleAvatarSuccess"
                 :before-upload="beforeAvatarUpload">
@@ -75,13 +75,17 @@
 </template>
 
 <script>
+import {serverIp} from "../../public/config";
+
 export default {
   // eslint-disable-next-line vue/multi-word-component-names
   name: "Mine.vue",
   data(){
     return {
       user: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')): {},
-      imageUrl: ''
+      imageUrl: '',
+      //部署
+      serverIp: serverIp
     }
   },
   methods:{

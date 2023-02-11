@@ -136,7 +136,11 @@ public class UserService extends ServiceImpl<UserMapper, User> {
         List<Menu> menus = menuService.findMenus();
         //获取角色对应的菜单集合
         QueryWrapper<RoleMenu> qw = new QueryWrapper<>();
-        qw.eq("role_id", role.getId());
+        if(role !=null){
+            qw.eq("role_id", role.getId());
+        }else{
+            return null;
+        }
         List<Integer> menuIds = menuService.list(new QueryWrapper<Menu>()
                         .in("id", roleMenuService.list(qw).stream().map(RoleMenu::getMenuId).collect(Collectors.toList())))
                 .stream().map(Menu::getId).collect(Collectors.toList());
@@ -180,6 +184,7 @@ public class UserService extends ServiceImpl<UserMapper, User> {
         } else {
             one = new User();
             BeanUtil.copyProperties(user, one, true);
+            one.setRole("ROLE_USER");
             if (save(one)) {
                 return Result.success();
             } else {

@@ -8,7 +8,7 @@
             class="upload-demo"
             style="display: inline-block"
             :show-file-list="false"
-            action="http://localhost/file/upload"
+            :action="'http://'+serverIp+'/file/upload'"
             :on-success="uploadSuccess"
             :on-error="uploadError"
             :limit="1"
@@ -61,6 +61,8 @@
 </template>
 
 <script>
+import {serverIp} from "../../public/config";
+
 export default {
   // eslint-disable-next-line vue/multi-word-component-names
   name: "File",
@@ -75,6 +77,8 @@ export default {
       total: 0,
       //四个按钮相关
       multipleSelection: [],
+      //部署
+      serverIp: serverIp
     }
   },
   created() {

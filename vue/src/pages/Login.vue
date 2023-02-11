@@ -1,6 +1,6 @@
 <template>
   <div class="wrapper">
-    <div style="margin: 200px auto;width: 350px;padding: 20px;
+    <div style="margin: 15% auto;width: 45vh;padding: 20px;
     background: rgba(255, 255, 255, 0.8);
     border-radius: 25px;
 ">

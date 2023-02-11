@@ -1,11 +1,11 @@
 import axios from 'axios'
 import ElementUI from "element-ui";
+import {serverIp} from "../../public/config";
 
 const request = axios.create({
-    baseURL: 'http://localhost',  // 注意！！ 这里是全局统一加上了 后端接口前缀 前缀，后端必须进行跨域配置！
+    baseURL: 'http://'+serverIp,  // 注意！！ 这里是全局统一加上了 后端接口前缀 前缀，后端必须进行跨域配置！
     timeout: 5000
 })
-
 // request 拦截器
 // 可以自请求发送前对请求做一些处理
 // 比如统一加token，对请求参数统一加密

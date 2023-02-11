@@ -25,7 +25,7 @@
             class="upload-demo"
             style="display: inline-block"
             :show-file-list="false"
-            action="http://localhost/user/import"
+            :action="'http://'+serverIp+'/user/import'"
             :accept="'.xlsx'"
             :on-success="importSuccess"
             :on-error="importFailed"
@@ -45,9 +45,9 @@
           </el-form-item>
           <el-form-item label="角色" label-width="80px" label-align="right">
             <el-select clearable v-model="form.role" placeholder="请选择角色..." style="width:100%">
-              <el-option v-for="role in roles" :key="role.flag" :label="role.name" :value="role.flag" >
-                <span style="font-weight: 800">{{role.name}}：</span>
-                <span style="margin-left: 30px"><i>{{role.description}}</i></span>
+              <el-option v-for="role in roles" :key="role.flag" :label="role.name" :value="role.flag">
+                <span style="font-weight: 800">{{ role.name }}：</span>
+                <span style="margin-left: 30px"><i>{{ role.description }}</i></span>
               </el-option>
             </el-select>
           </el-form-item>
@@ -62,7 +62,7 @@
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
-<!--          <el-button @click="dialogFormVisible = false">取 消</el-button>-->
+          <!--          <el-button @click="dialogFormVisible = false">取 消</el-button>-->
           <el-button>取 消</el-button>
           <el-button type="primary" @click="sendCreateOrUpdateRequest">确 定</el-button>
         </div>
@@ -108,6 +108,8 @@
 </template>
 
 <script>
+import {serverIp} from "../../public/config";
+
 export default {
   // eslint-disable-next-line vue/multi-word-component-names
   name: "User",
@@ -130,7 +132,9 @@ export default {
       multipleSelection: [],
       showImportDialog: false,
       //选择角色
-      roles: {}
+      roles: {},
+      //部署
+      serverIp: serverIp
     }
   },
   methods: {
@@ -157,10 +161,10 @@ export default {
               // console.log("分页数据请求成功！", response)
               this.tableData = response.data.records
               this.total = response.data.total
-            }else if(response.code === '401'){
+            } else if (response.code === '401') {
               //由于已经在request.js中进行过全局配置了，所以不需要再进行提示，只需要push即可
               // this.$message.error(response.msg)
-              console.log(response.msg,response)
+              console.log(response.msg, response)
               this.$router.push('/login')
             }
           }
@@ -168,14 +172,14 @@ export default {
         console.log("分页数据请求失败！", error)
       })
       //查询角色信息
-      this.request.get('/role/selectAll').then(res=>{
-        if(res.code === '200'){
+      this.request.get('/role/selectAll').then(res => {
+        if (res.code === '200') {
           this.roles = res.data
-        }else{
+        } else {
           this.$message.error('获取角色信息失败')
         }
-      }).catch(err=>{
-        console.log('获取角色信息失败',err)
+      }).catch(err => {
+        console.log('获取角色信息失败', err)
       })
     },
     handleCommand(command) {
@@ -299,7 +303,7 @@ export default {
           type: 'success',
           message: '导出成功!'
         });
-        window.open("http://localhost/user/export")
+        window.open("http://"+serverIp+"/user/export")
       }).catch(() => {
         this.$message({
           type: 'info',
