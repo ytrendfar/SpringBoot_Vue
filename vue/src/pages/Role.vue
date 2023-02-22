@@ -20,7 +20,7 @@
       <el-table-column prop="id" label="ID" align="center" width="50"></el-table-column>
       <el-table-column prop="name" label="角色名称"></el-table-column>
       <el-table-column prop="description" label="描述"></el-table-column>
-      <el-table-column prop="edit" label="操作" align="center" width="260">
+      <el-table-column prop="edit" label="操作" align="center" width="275">
         <template slot-scope="scope">
           <el-button-group>
             <el-button type="success" icon="el-icon-menu" @click="giveMenu(scope.row.id)">分配菜单</el-button>
